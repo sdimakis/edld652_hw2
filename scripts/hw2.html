@@ -1629,7 +1629,7 @@ figure_1 %&gt;%
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
-<pre class="r"><code>crime &lt;- read_csv(here(&quot;data&quot;, &quot;crime.csv&quot;))
+<pre class="r"><code>crime &lt;- readr::read_csv(unzip(here(&quot;data&quot;, &quot;crime.zip&quot;), &quot;crime.csv&quot;))
 
 model_data &lt;- crime %&gt;% 
   mutate(neighborhood_id = relevel(factor(NEIGHBORHOOD_ID), ref = &quot;barnum&quot;))

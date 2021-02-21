@@ -157,7 +157,7 @@ figure_1 %>%
 
 ```{r message=FALSE, warning=FALSE}
 
-crime <- read_csv(here("data", "crime.csv"))
+crime <- readr::read_csv(unzip(here("data", "crime.zip"), "crime.csv"))
 
 model_data <- crime %>% 
   mutate(neighborhood_id = relevel(factor(NEIGHBORHOOD_ID), ref = "barnum"))
