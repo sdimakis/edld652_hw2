@@ -17,7 +17,7 @@ library(here)
 library(ggridges)
 library(ungeviz)
 library(colorspace)
-
+library(ggtext)
 ```
 
 ```{r, message = FALSE, warning = FALSE}
@@ -151,5 +151,52 @@ figure_1 %>%
                                 lighten("#d61200", .6)))
 
 
+```
+
+# Problem 3
+
+```{r message=FALSE, warning=FALSE}
+
+crime <- readr::read_csv(unzip(here("data", "crime.zip"), "crime.csv"))
+
+model_data <- crime %>% 
+  mutate(neighborhood_id = relevel(factor(NEIGHBORHOOD_ID), ref = "barnum"))
+
+m <- glm(IS_CRIME ~ neighborhood_id, 
+         data = model_data,
+         family = "binomial")
+
+tidied <- broom::tidy(m)
+
+regis <- tidied %>% 
+  filter(term == "neighborhood_idregis")
+
+discretized <- data.frame(
+  x = qnorm(ppoints(20),
+            mean = regis$estimate,
+            sd = regis$std.error)
+  ) %>% 
+  mutate(regis = ifelse(x <= 0, "#887E96", "#55B190"))
+```
+
+
+```{r}
+ggplot(discretized, aes(x)) +
+  geom_dotplot(aes(fill = regis), binwidth=0.031)+
+  geom_vline(xintercept = 0, 
+             color = "#C04D49", 
+             size = 1.5) + 
+  scale_fill_identity(guide = "none") +
+  labs(title = "Probability of differential crime rates between neighborhoods",
+       subtitle = "<span style = 'color: #887E96'>**Regis**</span> compared to 
+       <span style = 'color: #55B190'>**Barnum**</span>",
+       x = "Difference in log odds of a crime being committed",
+       caption = "Each ball represents 5% probablity") + 
+  theme_minimal() +
+  theme(plot.subtitle = element_markdown(),
+        legend.position = "none",
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+  
 ```
 
