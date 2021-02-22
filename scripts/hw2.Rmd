@@ -200,3 +200,4 @@ ggplot(discretized, aes(x)) +
   
 ```
 
+# Problem 4
