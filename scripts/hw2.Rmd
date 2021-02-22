@@ -201,8 +201,6 @@ ggplot(discretized, aes(x)) +
 ```
 
 # Problem 4
-<<<<<<< HEAD
-
 ```{r}
 library(gt)
 
@@ -255,5 +253,3 @@ tbl_data %>%
     source_note = md("Denver Crime Data Distributed via [Kaggle](https://www.kaggle.com/paultimothymooney/denver-crime-data)")
   )
 ```
-=======
->>>>>>> question4
