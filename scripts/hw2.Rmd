@@ -18,6 +18,7 @@ library(ggridges)
 library(ungeviz)
 library(colorspace)
 library(ggtext)
+library(gt)
 ```
 
 ```{r, message = FALSE, warning = FALSE}
@@ -202,9 +203,8 @@ ggplot(discretized, aes(x)) +
 
 # Problem 4
 ```{r}
-library(gt)
-
-tbl_data <- crime %>% # change reported_date to just the year
+# deal with year
+tbl_data <- crime %>%
   mutate(YEAR = case_when(
     grepl("2016", REPORTED_DATE) ~ "2016",
     grepl("2017", REPORTED_DATE) ~ "2017",
@@ -212,31 +212,47 @@ tbl_data <- crime %>% # change reported_date to just the year
     grepl("2019", REPORTED_DATE) ~ "2019",
     grepl("2020", REPORTED_DATE) ~ "2020",
     grepl("2021", REPORTED_DATE) ~ "2021")
-    ) %>% # select only the relevant columns
-  dplyr::select(c(DISTRICT_ID, OFFENSE_CATEGORY_ID, YEAR)) %>% # get the offense count for each district/year
-  count(OFFENSE_CATEGORY_ID, DISTRICT_ID, YEAR) %>% # group offense count by year
+    ) %>%
+  dplyr::select(DISTRICT_ID, OFFENSE_CATEGORY_ID, YEAR) %>%
+  count(OFFENSE_CATEGORY_ID, DISTRICT_ID, YEAR) %>%
   pivot_wider(names_from = "YEAR",
-              values_from = "n") %>% # choose only the offense categories we want for the table
+              values_from = "n")%>%
+  replace(is.na(.), 0)
+
+# deal with offense category
+ tbl_data <- tbl_data %>% 
   filter(OFFENSE_CATEGORY_ID == "aggravated-assault" |
            OFFENSE_CATEGORY_ID == "sexual-assault" |
            OFFENSE_CATEGORY_ID == "murder" |
-           OFFENSE_CATEGORY_ID == "other-crimes-against-persons") %>% # choose only districts 1,3,5
-  filter(DISTRICT_ID == "1" |
-           DISTRICT_ID == "3" |
-           DISTRICT_ID == "5") %>% # replace all NAs with 0
-  replace(is.na(.), 0) %>% # change the names of each offense
-  mutate(OFFENSE_CATEGORY_ID = case_when(
+           OFFENSE_CATEGORY_ID == "other-crimes-against-persons") %>% 
+  mutate(OFFENSE_CATEGORY_ID = factor(OFFENSE_CATEGORY_ID,
+                                      levels = c(
+                                        "aggravated-assault", 
+                                        "sexual-assault", 
+                                        "murder", 
+                                        "other-crimes-against-persons"))) %>% 
+   mutate(OFFENSE_CATEGORY_ID = case_when(
     OFFENSE_CATEGORY_ID == "aggravated-assault" ~ "Aggravated Assault",
     OFFENSE_CATEGORY_ID == "sexual-assault" ~ "Sexual Assault",
     OFFENSE_CATEGORY_ID == "murder" ~ "Murder",
-    OFFENSE_CATEGORY_ID == "other-crimes-against-persons" ~ "Other Crimes Against Persons")) %>% # change the names of each district
+    OFFENSE_CATEGORY_ID == "other-crimes-against-persons" ~ "Other Crimes Against Persons"))
+ 
+# deal with district 
+tbl_data <- tbl_data %>% 
+  filter(DISTRICT_ID == "1" |
+           DISTRICT_ID == "3" |
+           DISTRICT_ID == "5") %>% 
   mutate(DISTRICT_ID = case_when(
     DISTRICT_ID == "1" ~ "District 1",
     DISTRICT_ID == "3" ~ "District 3",
     DISTRICT_ID == "5" ~ "District 5"))
 
-tbl_data %>% 
-  group_by(DISTRICT_ID) %>% 
+tbl_data %>%
+  group_by(DISTRICT_ID) %>%
+  arrange(match(OFFENSE_CATEGORY_ID, c("Aggravated Assault", 
+                                       "Sexual Assault",
+                                      "Murder",
+                                      "Other Crimes Against Persons"))) %>% 
   gt() %>% 
   tab_spanner(
     label = "Year",
@@ -252,4 +268,5 @@ tbl_data %>%
   tab_source_note(
     source_note = md("Denver Crime Data Distributed via [Kaggle](https://www.kaggle.com/paultimothymooney/denver-crime-data)")
   )
+
 ```
