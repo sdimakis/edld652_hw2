@@ -34,6 +34,8 @@ da_theme <- theme_minimal(base_size = 13) +
         panel.grid.major.x = element_line(color = "gray90"),
         plot.title.position = "plot")
 
+# Haha! I love it!
+
 country_codes <- countrycode::codelist %>% 
   select(country_name = country.name.en, country = ecb)
 ```
@@ -54,6 +56,8 @@ figure_1 <- transit_cost %>%
   filter(average_transit_cost != "NaN") %>% 
   filter(country != "UK") # it looks like you didn't use UK in your plot so I took it out too
 
+# DA: I think I had just used `left_join()` with the country codes list
+
 #if I wanted to keep in the UK I would need to give it a name
 # it didn't match because it is in country codes as "GB" 
 #figure_1[53, "country_name"] <- "United Kingdom"
@@ -66,6 +70,8 @@ figure_1 <- transit_cost %>%
 ci <- function(p){
   figure_1$average_transit_cost + qnorm(p)*figure_1$se
 }
+
+# DA: I like it!
 
 figure_1 %>% 
   ggplot(aes(x = average_transit_cost, y = fct_reorder(country_name, average_transit_cost))) +
@@ -86,7 +92,8 @@ figure_1 %>%
                      labels = scales::comma) +
   da_theme +
   geom_vline(xintercept = 0, color = "gray90")
-  
+
+# DA: Looks wonderful!  
 ```
 
 # Problem 2
@@ -111,6 +118,7 @@ figure_1 %>%
   da_theme +
   geom_vline(xintercept = 0, color = "gray90")
 
+# Perfect!
 ```
 
 ## Multiple error bars
@@ -151,7 +159,7 @@ figure_1 %>%
                                 lighten("#d61200", .3),
                                 lighten("#d61200", .6)))
 
-
+# DA: Love it. Nice color choices too.
 ```
 
 # Problem 3
@@ -198,7 +206,8 @@ ggplot(discretized, aes(x)) +
         legend.position = "none",
         axis.title.y = element_blank(),
         axis.text.y = element_blank())
-  
+
+# Looks great!
 ```
 
 # Problem 4
@@ -263,10 +272,12 @@ tbl_data %>%
              columns = vars(OFFENSE_CATEGORY_ID)) %>% 
   tab_header(
     title = "Crimes Against Persons in Denver: 2014 to Present",
-    subtitle = "Sample of three districts"
+    subtitle = md("*Sample of three districts*")
   ) %>% 
   tab_source_note(
     source_note = md("Denver Crime Data Distributed via [Kaggle](https://www.kaggle.com/paultimothymooney/denver-crime-data)")
   )
 
+# Super minor and not something I'll remove points for but you missed the 
+# italicized subtitle. I added it in above.
 ```
